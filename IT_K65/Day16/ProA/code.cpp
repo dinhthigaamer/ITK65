@@ -1,70 +1,50 @@
-#include "testlib.h"
-#include <iostream>
-
+#include<bits/stdc++.h>
 using namespace std;
+
+#define MAX 500010
 #define ll long long 
-#define MAX 200010
 
 int n,q;
+ll cnt[MAX], a[MAX];
 
-int ran(int L,int R) 
+void solve()
 {
-    int range = R-L+1;
-    int k1 = rnd.next(0, R-L);
-    int k2 = rnd.next(0, R-L);
-    return L + 1ll*k1*k2%range;
-}
+    cin>>n>>q;
 
-void Gen(int limit)
-{
-    int n,m;
-    if(limit <= 6){
-         n = ran(1, 100);
-         m = ran(1, 100);
+    for(int i=1;i<=n;++i)
+    {
+        cin>>a[i];
+        if(i>1 && a[i]<=a[i-1]) cnt[i]=a[i-1]-a[i]+1; 
+        cnt[i]+=cnt[i-1];
     }
-    else 
-    if(limit <= 12) {
-        n = ran(1, 100);
-        m = ran(1, 500000);
-    }
-    else 
-    if(limit <= 17){
-        n = ran(1, 500000);
-        m = ran(1, 500000);
-    }
-    else {
-        n = 500000;
-        m = 500000;
-    }
-    cout<<n<<' '<<m<<endl;
 
-    for(int i=1;i<=n;++i) {
-        int x = ran(-1000000000, 1000000000);
-        cout<<x<<' ';
+    for(int i=1;i<=q;++i)
+    {
+        int l,r;
+        cin>>l>>r;
+        cout<<cnt[r]-cnt[l]<<'\n';
     }
-    cout<<endl;
-    for(int i=1;i<=m;++i) {
-        int L = ran(1,n-1);
-        int R = ran(L+1,n);
-        cout<<L<<' '<<R<<'\n'; 
-    }
+
+    for(int i=1;i<=n;++i) cnt[i]=0;
 }
 
 void File()
 {
-    freopen("file.inp","w",stdout);
+    freopen("file.inp","r",stdin);
+    freopen("file.out","w",stdout);
 }
 
-int main(int argc, char* argv[])
+int main()
 {
-    registerGen(argc, argv, 1);
-    prepareOpts(argc, argv);
     //File();
-    int value_t = opt<int>("value_t"); 
-    int order = opt<int>("order");
 
-    Gen(value_t);
-    
+    ios_base::sync_with_stdio(NULL);cin.tie(NULL);
+    int test=1;
+
+    while(test--)
+    {
+        solve();
+    }
 
     return 0;
 }
