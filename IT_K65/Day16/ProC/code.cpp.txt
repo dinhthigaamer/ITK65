@@ -1,0 +1,122 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+#define MAX 200010
+#define int long long
+
+struct query
+{
+   int type,u,v;
+}que[MAX];
+
+int n,m,q;
+int par[MAX],sum[MAX];
+int res;
+pair<int,int> edge[MAX];
+int w[MAX];
+int mask[MAX];
+int ans[MAX];
+
+struct segment_tree
+{
+   int st[MAX*4];
+
+   void reset()
+   {
+       memset(st,-0x3f3f,sizeof(st));
+   }
+
+   void update(int id,int l,int r,int i,int val)
+   {
+       if(i<l || i>r) return ;
+       if(l==i && i==r)
+       {
+           st[id]=val;
+           return ;
+       }
+       int mid=(l+r)/2;
+       update(id*2,l,mid,i,val) ; update(id*2+1,mid+1,r,i,val);
+       st[id]=max(st[id*2],st[id*2+1]);
+   }
+}it;
+
+int dsu(int u)
+{
+    return (par[u]<0)?u:par[u]=dsu(par[u]);
+}
+
+void match(int u,int v)
+{
+    u=dsu(u) ; v=dsu(v);
+    if(u==v) return ;
+    if(par[u]>par[v]) swap(u,v);
+    par[u]+=par[v];
+    par[v]=u;
+    sum[u]+=sum[v];
+    sum[v]=0;
+    it.update(1,1,n,u,sum[u]);
+    it.update(1,1,n,v,-1e18);
+}
+
+void que1(int id)
+{
+    int u=edge[que[id].u].first , v=edge[que[id].u].second;
+    ans[id]=it.st[1];
+    match(u,v);
+   // for(int i=1;i<=n;++i) cout<<sum[i]<<' ';cout<<endl;
+}
+
+void que2(int id)
+{
+   int u=que[id].u , val=que[id].v;
+   int pu=dsu(u);
+   ans[id]=it.st[1];
+   sum[pu]=sum[pu]-w[u]+val;
+   it.update(1,1,n,pu,sum[pu]);//for(int i=1;i<=n;++i) cout<<sum[i]<<' ';cout<<endl;
+   w[u]=val;
+}
+
+int32_t main()
+{
+    cin>>n>>m>>q;
+    for(int i=1;i<=n;++i) cin>>w[i];
+    for(int i=1;i<=m;++i) cin>>edge[i].first>>edge[i].second;
+
+    for(int i=1;i<=n*4;++i) it.st[i] = -1e18;
+
+    for(int i=1;i<=q;++i)
+    {
+        int u,v;
+        char type;
+        cin>>type>>u;
+        if(type=='D')
+        {
+            que[i]={0,u,0};
+            mask[u]=1;
+        }
+        else
+        {
+            cin>>v;
+            que[i]={1,u,w[u]};
+            w[u]=v;
+        }
+    }
+
+    for(int i=1;i<=n;++i) par[i]=-1 , sum[i]=w[i];
+    for(int i=1;i<=n;++i) it.update(1,1,n,i,w[i]);
+
+    for(int i=1;i<=m;++i) if(!mask[i])
+    {
+        int u=edge[i].first , v=edge[i].second;
+        match(u,v);
+    }
+
+    for(int i=q;i>=1;--i)
+    {
+        int type=que[i].type;
+        if(!type) que1(i);
+        else que2(i);
+    }
+    for(int i=1;i<=q;++i) cout<<ans[i]<<'\n';
+    return 0;
+}
