@@ -1,0 +1,74 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+int A,B,C,D;
+int f[15][15][15][15];
+
+int check1(int a,int b,int c,int d)
+{
+    //2 A,1 B,2 D
+    return (a>=2 && b>=1 && d>=2);
+}
+
+int check2(int a,int b,int c,int d)
+{
+   //1 A,B,C,D
+   return (a>=1 && b>=1 && c>=1 && d>=1);
+}
+
+int check3(int a,int b,int c,int d)
+{
+    //2 C,1 D
+    return (c>=2 && d>=1);
+}
+
+int check4(int a,int b,int c,int d)
+{
+    // 3 B
+    return (b>=3);
+}
+
+int check5(int a,int b,int c,int d)
+{
+    //1 A,1 D
+    return (a>=1 && d>=1);
+}
+
+int dp(int a,int b,int c,int d)
+{
+    int ok1=check1(a,b,c,d);
+    int ok2=check2(a,b,c,d);
+    int ok3=check3(a,b,c,d);
+    int ok4=check4(a,b,c,d);
+    int ok5=check5(a,b,c,d);
+
+    if(ok1+ok2+ok3+ok4+ok5==0) return 0;
+    int &x=f[a][b][c][d];
+    if(x!=-1) return x;
+
+    x=1;
+    if(ok1) x=min(x,dp(a-2,b-1,c,d-2));
+    if(ok2) x=min(x,dp(a-1,b-1,c-1,d-1));
+    if(ok3) x=min(x,dp(a,b,c-2,d-1));
+    if(ok4) x=min(x,dp(a,b-3,c,d));
+    if(ok5) x=min(x,dp(a-1,b,c,d-1));//cout<<a<<' '<<b<<' '<<c<<' '<<d<<endl;
+    x=x^1;
+    return x;
+}
+
+int main()
+{
+    //ios_base::sync_with_stdio(NULL);cin.tie(NULL);
+    int test;
+    cin>>test;
+    while(test--)
+    {
+        memset(f,-1,sizeof(f));
+        cin>>A>>B>>C>>D;
+        int x=dp(A,B,C,D);
+        if(x==1) puts("A");
+        else
+           puts("B");
+    }
+    return 0;
+}
